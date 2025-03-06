@@ -15,6 +15,10 @@ This repository contains a system for detecting and estimating the 3D pose (posi
     * Saving results to a JSON file, a 2d detection image (.png file), a capture from the 3d detections (.png).
 
 * **`server.py`:** This file implements a FastAPI server that provides an API endpoint for processing screw detection requests.  It handles file uploads (image, point cloud, transformation matrix), calls the `main.py` functions to perform the detection and pose estimation, and returns the results (JSON and visualization image).  It also includes an endpoint for visualization only, given a point cloud and detection(.json) file.
+* The input is in the below format :
+	* a 3d point cloud file (.ply) file - you can generate it from any depth camera as well
+	* a png image of the image 
+	* a JSON file which contains the camera transformations (extrinsic parameters)
 
 ## Dependencies:
 
@@ -27,7 +31,7 @@ To run this system, you will need to install the following Python packages:
 1. **`main.py` (Standalone):**  This script can be run directly from the command line.  You'll need to provide paths to the input image, point cloud (PLY file), transformation matrix (JSON file), and output directory as command-line arguments.  See the script for details on argument usage.
 
 To detect and visualize from a single folder :
-	python main.py screw_detection_challenge/battery_pack_1/MAN_ImgCap_closer_zone_10 --visualize
+	python main.py screw_detection_challenge/battery_pack_1/image1 --visualize
 
 To detect and visualize the entire dataset :
 	python main.py screw_detection_challenge --bulk
