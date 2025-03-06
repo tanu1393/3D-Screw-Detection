@@ -1,0 +1,54 @@
+
+# 3D Screw Detection and Pose Estimation System
+
+This repository contains a system for detecting and estimating the 3D pose (position and orientation) of screws from a point cloud and a corresponding image.  The system is implemented using Python and leverages libraries such as OpenCV, Open3D, and NumPy.
+
+## Files:
+
+* **`main.py`:** This file contains the core logic for screw detection and pose estimation.  It implements the following functionalities:
+    * Image loading and preprocessing.
+    * 2D screw detection using the Hough Circle Transform and contour analysis.
+    * 3D screw position estimation by projecting 2D detections onto a point cloud.
+    * Screw orientation estimation using Principal Component Analysis (PCA).
+    * Transformation of screw poses to the robot coordinate system.
+    * Visualization of results using Open3D (both 2D and 3D visualizations).
+    * Saving results to a JSON file, a 2d detection image (.png file), a capture from the 3d detections (.png).
+
+* **`server.py`:** This file implements a FastAPI server that provides an API endpoint for processing screw detection requests.  It handles file uploads (image, point cloud, transformation matrix), calls the `main.py` functions to perform the detection and pose estimation, and returns the results (JSON and visualization image).  It also includes an endpoint for visualization only, given a point cloud and detection(.json) file.
+
+## Dependencies:
+
+To run this system, you will need to install the following Python packages:
+
+	pip install -r requirements.txt
+
+## Usage:
+
+1. **`main.py` (Standalone):**  This script can be run directly from the command line.  You'll need to provide paths to the input image, point cloud (PLY file), transformation matrix (JSON file), and output directory as command-line arguments.  See the script for details on argument usage.
+
+To detect and visualize from a single folder :
+	python main.py screw_detection_challenge/battery_pack_1/MAN_ImgCap_closer_zone_10 --visualize
+
+To detect and visualize the entire dataset :
+	python main.py screw_detection_challenge --bulk
+	
+2. **`server.py` (API):**  Run the FastAPI server using:
+
+	uvicorn server:app --host 0.0.0.0 --port 8000
+
+Then, send POST requests to the `/detect` endpoint with the image, point cloud, and transformation matrix files.  Include a `show_visualization` boolean parameter in the request body to enable or disable the visualization.  The `/viz` endpoint can be used to visualize results given a point cloud and detection (.json) file.
+
+## Algorithm Overview:
+
+The system employs a multi-stage pipeline:
+
+1. **Image Processing:**  Preprocesses the image (Gaussian blur, adaptive thresholding) and uses the Hough Circle Transform to detect screw heads.  Contour analysis refines the detections.
+
+2. **Point Cloud Processing:** Projects the 2D screw positions onto the 3D point cloud using camera intrinsics.  Finds the nearest point in the point cloud for each 2D detection to estimate the 3D position.
+
+3. **Orientation Estimation:** Uses PCA on neighboring points to estimate screw orientation.
+
+4. **Coordinate Transformation:** Transforms screw poses from camera to robot coordinates.
+
+5. **Visualization:** Generates 2D and 3D visualizations using Open3D.
+
